@@ -1,6 +1,6 @@
 #include "template.h"
+#include "test_runner.h"
 #include <cassert>
-#include <functional>
 
 // Dynamic programming implementation of Fibonacci sequence
 long long calcFib(int n) {
@@ -20,16 +20,10 @@ long long calcFib(int n) {
     }
     return dp[n];
 }
-// Helper function to run a test and catch exceptions
-string runTest(const string& testName, function<void()> testFunc) {
-    try {
-        testFunc();
-        return testName + ": PASSED";
-    } catch (const exception& e) {
-        return testName + ": FAILED with exception: " + e.what();
-    } catch (...) {
-        return testName + ": FAILED with unknown exception";
-    }
+
+// dummy test function example
+void testFunction() {
+    assert(true); // Example test case
 }
 
 // Test function for calcFib
@@ -54,11 +48,6 @@ void testCalcFib() {
     assert(calcFib(50) == 12586269025);
     // Test case 10
     assert(calcFib(60) == 1548008755920);
-}
-
-// Another test function example
-void testFunction() {
-    assert(true); // Example test case
 }
 
 // Testing function runner
