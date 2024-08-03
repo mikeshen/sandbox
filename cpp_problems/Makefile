@@ -6,9 +6,6 @@ CXX = g++-10
 # Compiler flags
 CXXFLAGS = -std=c++2a -Wall -Wextra -O2
 
-# Target executable
-TARGET = reconciler
-
 # Source files
 SRCS = reconciler.cpp test_runner_fib.cpp
 
