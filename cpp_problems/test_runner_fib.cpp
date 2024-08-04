@@ -3,7 +3,7 @@
 #include <cassert>
 
 // Dynamic programming implementation of Fibonacci sequence
-long long calcFib(int n) {
+unsigned long long calcFib(int n) {
     const int size = 93; // Largest Fibonacci number storable in long long
     static vector<long long> dp(size + 1, -1); // Static storage for already calculated figures
     if (dp[0] == -1) dp[0] = 0; // Initialize base case
@@ -48,6 +48,10 @@ void testCalcFib() {
     assert(calcFib(50) == 12586269025);
     // Test case 10
     assert(calcFib(60) == 1548008755920);
+    // Test case 11: second largest fib number
+    assert(calcFib(92) == 7540113804746346429);
+    // Test case 11: largest fib number
+    assert(calcFib(93) == 12200160415121876738ULL);
 }
 
 // Testing function runner
