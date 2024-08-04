@@ -6,18 +6,18 @@
 long long calcFib(int n) {
     const int size = 93; // Largest Fibonacci number storable in long long
     static vector<long long> dp(size + 1, -1); // Static storage for already calculated figures
-    if (n == 0) {
-        return 0;
-    }
-    else if (n == 1) {
-        return 1;
-    }
-    else if (dp[n] != -1) {
+    if (dp[0] == -1) dp[0] = 0; // Initialize base case
+    if (dp[1] == -1) dp[1] = 1; // Initialize base case
+
+    if (dp[n] != -1) {
         return dp[n];
     }
-    else {
-        dp[n] = calcFib(n - 1) + calcFib(n - 2);
-    }
+
+    for (int i = 2; i <= n; ++i) {
+        if (dp[i] == -1) {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+    }    
     return dp[n];
 }
 
