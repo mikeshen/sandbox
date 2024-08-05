@@ -1,6 +1,5 @@
 #include "template.h"
 #include "test_runner.h"
-#include <cassert>
 
 // Dynamic programming implementation of Fibonacci sequence
 unsigned long long calcFib(int n) {
@@ -19,40 +18,40 @@ unsigned long long calcFib(int n) {
 
 // dummy test function example
 void testFunction() {
-    assert(true); // Example test case
+    customAssert(true); // Example test case
 }
 
 void testTwo() {
     int two = 2;
-    assert(2 == two); // Example test case
+    customAssert(2 == two); // Example test case
 }
 
 // Test function for calcFib
 void testCalcFib() {
     // Test case 1
-    assert(calcFib(0) == 0);
+    customAssert(calcFib(0) == 0);
     // Test case 2
-    assert(calcFib(1) == 1);
+    customAssert(calcFib(1) == 1);
     // Test case 3
-    assert(calcFib(2) == 1);
+    customAssert(calcFib(2) == 1);
     // Test case 4
-    assert(calcFib(6) == 8);
+    customAssert(calcFib(6) == 8);
     // Test case 5
-    assert(calcFib(10) == 55);
+    customAssert(calcFib(10) == 55);
     // Test case 6
-    assert(calcFib(20) == 6765);
+    customAssert(calcFib(20) == 6765);
     // Test case 7
-    assert(calcFib(30) == 832040);
+    customAssert(calcFib(30) == 832040);
     // Test case 8
-    assert(calcFib(40) == 102334155);
+    customAssert(calcFib(40) == 102334155);
     // Test case 9
-    assert(calcFib(50) == 12586269025);
+    customAssert(calcFib(50) == 12586269025);
     // Test case 10
-    assert(calcFib(60) == 1548008755920);
+    customAssert(calcFib(60) == 1548008755920);
     // Test case 11: second largest fib number
-    assert(calcFib(92) == 7540113804746346429);
+    customAssert(calcFib(92) == 7540113804746346429);
     // Test case 11: largest fib number
-    assert(calcFib(93) == 12200160415121876738ULL);
+    customAssert(calcFib(93) == 12200160415121876738ULL);
 }
 
 // Testing function runner
