@@ -8,22 +8,23 @@ unsigned long long calcFib(int n) {
     static vector<long long> dp(size + 1, -1); // Static storage for already calculated figures
     if (dp[0] == -1) dp[0] = 0; // Initialize base case
     if (dp[1] == -1) dp[1] = 1; // Initialize base case
-
-    if (dp[n] != -1) {
+    if (dp[n] != -1)
         return dp[n];
-    }
-
-    for (int i = 2; i <= n; ++i) {
-        if (dp[i] == -1) {
+    for (int i = 2; i <= n; ++i)
+        if (dp[i] == -1)
             dp[i] = dp[i - 1] + dp[i - 2];
-        }
-    }    
+
     return dp[n];
 }
 
 // dummy test function example
 void testFunction() {
     assert(true); // Example test case
+}
+
+void testTwo() {
+    int two = 2;
+    assert(2 == two); // Example test case
 }
 
 // Test function for calcFib
@@ -60,6 +61,7 @@ void runTests() {
 
     // Add test functions here
     testResults.push_back(runTest("testFunction", testFunction));
+    testResults.push_back(runTest("testTwo", testTwo));
     testResults.push_back(runTest("testCalcFib", testCalcFib));
 
     // Print test results
