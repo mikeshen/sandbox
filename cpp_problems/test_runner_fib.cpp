@@ -1,5 +1,8 @@
-#include "template.h"
+#include <vector>
+#include <iostream>
 #include "test_runner.h"
+
+using namespace std;
 
 // Dynamic programming implementation of Fibonacci sequence
 unsigned long long calcFib(int n) {
