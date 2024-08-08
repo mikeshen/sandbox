@@ -33,10 +33,6 @@ vector<string> reconcilePositions(
     unordered_map<string, double> d1Map = parsePositions(d1_pos);
     unordered_map<string, double> expectedMap = d0Map;
 
-    // for (auto i : d0Map) {
-    //     cout << i.first << " " << i.second << endl;
-    // }
-
     // 2. process trxns
     for (const string& trn : d1_trn) {
         istringstream ss(trn);
