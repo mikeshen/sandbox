@@ -1,13 +1,13 @@
-# Makefile for reconciler.cpp
+# Makefile
 
 # Compiler
-CXX = g++-10
+CXX = g++
 
 # Compiler flags
 CXXFLAGS = -std=c++2a -Wall -Wextra -O2
 
 # Source files
-SRCS = reconciler.cpp test_runner_fib.cpp stream.cpp
+SRCS = reconciler.cpp test_runner_fib.cpp stream.cpp djikstra.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)
