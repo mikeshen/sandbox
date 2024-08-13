@@ -36,7 +36,7 @@ class Buffer {
         }
 
         if (events[0].filter == EVFILT_READ) {
-          char temp[1024];
+          char temp[bufferSize_];
           int bytes_received = recv(socket, temp, 1024, 0);
           if (bytes_received < 0) {
             throw std::runtime_error("Failed to receive data");
@@ -66,7 +66,7 @@ class Buffer {
     }
 
   private:
-    int bufferSize_;
+    const int bufferSize_;
     char* buffer_;
     int bytesReceived_;
     static const int headerSize_ = 4; // Example header size
