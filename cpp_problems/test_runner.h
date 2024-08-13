@@ -23,3 +23,4 @@ std::string runTest(const std::string& testName, std::function<void()> testFunc)
         return testName + ": FAILED with unknown exception";
     }
 }
+

@@ -14,7 +14,7 @@ unordered_map<string, double> parsePositions(const vector<string>& positions) {
     unordered_map<string, double> posMap;
     for (const auto& pos : positions) {
         istringstream ss(pos);
-       string symbol;
+        string symbol;
         double amount;
         ss >> symbol >> amount;
         posMap[symbol] = amount;
@@ -23,10 +23,10 @@ unordered_map<string, double> parsePositions(const vector<string>& positions) {
 }
 
 vector<string> reconcilePositions(
-    vector<string> d0_pos,
-    vector<string> d1_trn,
-    vector<string> d1_pos
-) {
+        vector<string> d0_pos,
+        vector<string> d1_trn,
+        vector<string> d1_pos
+        ) {
     vector<string> discrepancies;
     // 1. parse positions
     unordered_map<string, double> d0Map = parsePositions(d0_pos);
@@ -90,20 +90,20 @@ string basic() {
 }
 
 /*
-The custodial data provider has sent us a revision to the transactions data.
-`DI-TRN-REVISED` completely overwrites `D1-TRN`. Adapt your code to handle the new input.
+   The custodial data provider has sent us a revision to the transactions data.
+   `DI-TRN-REVISED` completely overwrites `D1-TRN`. Adapt your code to handle the new input.
 
 ### Sample Input
 
-    ["AAPL 100", "GOOG 200", "Cash 10"] # D0-POS
+["AAPL 100", "GOOG 200", "Cash 10"] # D0-POS
 
-    ["AAPL SL 25 15000", "GOOG BY 20 10000", "AAPL SL 25 10000", "META SL 5 5000"]  ## DI-TRN-REVISED
+["AAPL SL 25 15000", "GOOG BY 20 10000", "AAPL SL 25 10000", "META SL 5 5000"]  ## DI-TRN-REVISED
 
-    ["AAPL 50", "GOOG 220", "Cash 20000"] # D1-POS
+["AAPL 50", "GOOG 220", "Cash 20000"] # D1-POS
 
 ### Sample Output
 
-    ["Cash -10", "META 5"]  # revised output
+["Cash -10", "META 5"]  # revised output
 */
 string revised() {
     vector<string> d0_pos = {"AAPL 100", "GOOG 200", "Cash 10"};

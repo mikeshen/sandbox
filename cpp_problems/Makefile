@@ -7,7 +7,7 @@ CXX = g++-10
 CXXFLAGS = -std=c++2a -Wall -Wextra -O2
 
 # Source files
-SRCS = reconciler.cpp test_runner_fib.cpp
+SRCS = reconciler.cpp test_runner_fib.cpp stream.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)
