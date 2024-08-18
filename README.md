@@ -1,7 +1,23 @@
+
 # sandbox
 The home of my projects before they become projects.
 
 Using Github as a sandbox has the advantage of allowing me to track changelog history as well as to be able to share all of work publicly.
 
-## project directory
-- **ai_images**: ai generated images using either Dall-E or Stable Diffusion.
+## Project Structure
+The project is organized into the following subfolders:
+
+### ai_images
+- **Description**: Contains AI-generated images.
+
+### cpp_problems
+- **Description**: Contains C++ programming problems and solutions.
+
+### data_science
+- **Description**: Contains data science projects and notebooks.
+
+### polymarket_quoter
+- **Description**: Contains scripts and notebooks for the Polymarket Quoter project.
+
+### python_problems
+- **Description**: Contains Python programming problems and solutions.
