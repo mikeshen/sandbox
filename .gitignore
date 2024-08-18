@@ -3,6 +3,23 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Ignore executable files
+*.exe
+*.out
+*.app
+
+# Ignore compiled libraries
+*.dll
+*.so
+*.dylib
+
+# Ignore other binary files
+*.bin
+*.elf
+
+# Ignore specific directories
+/build/
+
 # C extensions
 *.so
 *.o
