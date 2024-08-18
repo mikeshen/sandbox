@@ -7,7 +7,7 @@ CXX = g++
 CXXFLAGS = -std=c++2a -Wall -Wextra -O2
 
 # Source files
-SRCS = reconciler.cpp test_runner_fib.cpp stream.cpp djikstra.cpp
+SRCS = reconciler.cpp test_runner_fib.cpp djikstra.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)
@@ -20,7 +20,7 @@ all: $(TARGETS)
 
 # Rule to build the targets
 $(TARGETS): %: %.o
-	$(CXX) $(CXXFLAGS) -o $@ $<
+	$(CXX) $(CXXFLAGS) -o $@.out $<
 
 # Rule to build object files
 %.o: %.cpp
