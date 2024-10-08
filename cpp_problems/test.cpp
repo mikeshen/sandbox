@@ -33,12 +33,22 @@ void testFunction() {
     customAssert(true); // Example test case
 }
 
+void testTwo() {
+    int two = 2;
+    customAssert(2 == two); // Example test case
+}
+
+// dummy test function example
+void testFunction() {
+    customAssert(true); // Example test case
+
 // Testing function runner
 void runTests() {
     vector<string> testResults;
 
     // Add test functions here
     testResults.push_back(runTest("testFunction", testFunction));
+    testResults.push_back(runTest("testTwo", testTwo));
 
     // Print test results
     for (const auto& result : testResults) {
