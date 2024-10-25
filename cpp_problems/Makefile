@@ -28,7 +28,7 @@ $(TARGETS): %: %.o
 
 # Clean up
 clean:
-	rm -f $(TARGETS) $(OBJS)
+	rm -f $(TARGETS) $(OBJS) *.out
 
 # Phony targets
 .PHONY: all clean
