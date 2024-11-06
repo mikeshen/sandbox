@@ -16,8 +16,5 @@ The project is organized into the following subfolders:
 ### data_science
 - **Description**: Contains data science projects and notebooks.
 
-### polymarket_quoter
-- **Description**: Contains scripts and notebooks for the Polymarket Quoter project.
-
 ### python_problems
 - **Description**: Contains Python programming problems and solutions.
