@@ -15,6 +15,7 @@ if __name__ == '__main__':
 
     library.remove_book("1984")
     print(f"Number of books in the library after removal: {len(library)}")
+    library.add_book(Book("1984", "George Orwell", 328))
 
     # Search for a book
     search_result = library.search_book("To Kill a Mockingbird")
@@ -22,3 +23,7 @@ if __name__ == '__main__':
         print(f"Book found: {search_result}")
     else:
         print("Book not found.")
+    
+    filtered_books = filter(lambda book: book.page_length > 200, library)
+    for book in filtered_books:
+        print(book)
