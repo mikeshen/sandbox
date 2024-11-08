@@ -24,6 +24,6 @@ if __name__ == '__main__':
     else:
         print("Book not found.")
     
-    filtered_books = filter(lambda book: book.page_length > 200, library)
+    filtered_books = list(filter(lambda book: book.page_length > 200, library))
     for book in filtered_books:
         print(book)
