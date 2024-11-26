@@ -7,7 +7,7 @@ CXX = g++
 CXXFLAGS = -std=c++2a -Wall -Wextra -O2
 
 # Source files
-SRCS = main.cpp reconciler.cpp test_runner_fib.cpp djikstra.cpp disjoint_intervals.cpp
+SRCS = main.cpp stream.cpp reconciler.cpp test_runner_fib.cpp djikstra.cpp disjoint_intervals.cpp order_engine.cpp market_data.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)

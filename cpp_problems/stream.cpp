@@ -6,7 +6,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <sys/event.h>
+#include <sys/epoll.h>
 using namespace std;
 
 class Buffer {
@@ -16,34 +16,38 @@ class Buffer {
         ~Buffer() { delete[] buffer_; }
 
         void recvData(int socket) {
-            int kq = kqueue();
-            if (kq < 0) {
-                throw std::runtime_error("Failed to create kqueue");
+            int epfd = epoll_create1(0);
+            if (epfd < 0) {
+                throw std::runtime_error("Failed to create epoll instance");
             }
 
-            struct kevent event;
-            EV_SET(&event, socket, EVFILT_READ, EV_ADD, 0, 0, NULL);
-            if (kevent(kq, &event, 1, NULL, 0, NULL) < 0) {
-                throw std::runtime_error("Failed to add socket to kqueue");
+            struct epoll_event event;
+            event.events = EPOLLIN;
+            event.data.fd = socket;
+            if (epoll_ctl(epfd, EPOLL_CTL_ADD, socket, &event) < 0) {
+                throw std::runtime_error("Failed to add socket to epoll");
             }
 
             while (true) {
-                struct timespec timeout = {1, 0}; // 1-second timeout
-                struct kevent events[1];
-                int num_events = kevent(kq, NULL, 0, events, 1, &timeout);
+                struct epoll_event events[1];
+                int num_events = epoll_wait(epfd, events, 1, 1000); // 1-second timeout
                 if (num_events < 0) {
-                    throw std::runtime_error("Failed to wait for kqueue events");
+                    throw std::runtime_error("Failed to wait for epoll events");
                 }
 
-                if (events[0].filter == EVFILT_READ) {
+                if (num_events == 0) {
+                    continue; // Timeout, no events
+                }
+
+                if (events[0].events & EPOLLIN) {
                     char temp[bufferSize_];
-                    int bytes_received = recv(socket, temp, 1024, 0);
+                    int bytes_received = recv(socket, temp, sizeof(temp), 0);
                     if (bytes_received < 0) {
                         throw std::runtime_error("Failed to receive data");
                     }
 
                     if (bytes_received == 0) {
-                        break;
+                        break; // Connection closed
                     }
 
                     copy(temp, temp + bytes_received, buffer_ + bytesReceived_);
@@ -62,11 +66,12 @@ class Buffer {
                     }
                 }
             }
-            close(kq);
+
+            close(epfd);
         }
 
     private:
-        const int bufferSize_;
+        int bufferSize_;
         char* buffer_;
         int bytesReceived_;
         static const int headerSize_ = 4; // Example header size
