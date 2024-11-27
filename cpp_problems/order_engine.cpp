@@ -74,8 +74,7 @@ class Order
     // Copy assignment operator
     Order& operator=(const Order& other)
     {
-        if (this != &other)
-        {
+        if (this != &other) {
             orderId    = other.orderId;
             isBuy      = other.isBuy;
             price      = other.price;
@@ -89,8 +88,7 @@ class Order
     // Move assignment operator
     Order& operator=(Order&& other) noexcept
     {
-        if (this != &other)
-        {
+        if (this != &other) {
             orderId    = other.orderId;
             isBuy      = other.isBuy;
             price      = other.price;
@@ -110,8 +108,7 @@ class Order
 
 class OrderBook
 {
-    struct OrderNode
-    {
+    struct OrderNode {
         Order                          order;
         std::list<OrderNode>::iterator it;
         std::list<OrderNode>*          orderList; // Pointer to the list
@@ -144,12 +141,10 @@ class OrderBook
     template <typename Iterator, typename Comparator>
     void matchOrdersHelper(Order& incomingOrder, Iterator begin, Iterator end, Comparator comp)
     {
-        for (auto it = begin; it != end; ++it)
-        {
+        for (auto it = begin; it != end; ++it) {
             auto& orderList = it->second;
             for (auto listIt = orderList.begin();
-                 listIt != orderList.end() && incomingOrder.quantity > 0;)
-            {
+                 listIt != orderList.end() && incomingOrder.quantity > 0;) {
                 auto& existingOrder = listIt->order;
                 if (!comp(incomingOrder.price, existingOrder.price))
                     break;
@@ -158,12 +153,9 @@ class OrderBook
                 incomingOrder.quantity -= tradeQuantity;
                 existingOrder.quantity -= tradeQuantity;
 
-                if (existingOrder.quantity == 0)
-                {
+                if (existingOrder.quantity == 0) {
                     listIt = orderList.erase(listIt);
-                }
-                else
-                {
+                } else {
                     ++listIt;
                 }
             }
@@ -176,8 +168,7 @@ class OrderBook
         auto& matchingOrders = incomingOrder.isBuy ? sellOrders : buyOrders;
         auto& sameSideOrders = incomingOrder.isBuy ? buyOrders : sellOrders;
 
-        if (incomingOrder.isBuy)
-        {
+        if (incomingOrder.isBuy) {
             // Start from the lowest price for sell orders
             matchOrdersHelper(incomingOrder,
                               matchingOrders.begin(),
@@ -185,20 +176,14 @@ class OrderBook
                               std::less_equal<double>());
 
             // Delete empty levels starting from begin for sellOrders
-            for (auto it = matchingOrders.begin(); it != matchingOrders.end();)
-            {
-                if (it->second.empty())
-                {
+            for (auto it = matchingOrders.begin(); it != matchingOrders.end();) {
+                if (it->second.empty()) {
                     it = matchingOrders.erase(it);
-                }
-                else
-                {
+                } else {
                     ++it;
                 }
             }
-        }
-        else
-        {
+        } else {
             // Start from the highest price for buy orders
             matchOrdersHelper(incomingOrder,
                               matchingOrders.rbegin(),
@@ -206,29 +191,23 @@ class OrderBook
                               std::greater_equal<double>());
 
             // Delete empty levels starting from rbegin for buyOrders
-            for (auto it = matchingOrders.rbegin(); it != matchingOrders.rend();)
-            {
-                if (it->second.empty())
-                {
+            for (auto it = matchingOrders.rbegin(); it != matchingOrders.rend();) {
+                if (it->second.empty()) {
                     it = decltype(it)(matchingOrders.erase(std::next(it).base()));
-                }
-                else
-                {
+                } else {
                     ++it;
                 }
             }
         }
 
         // Handle remaining quantities for fill-or-kill orders
-        if (incomingOrder.fillOrKill && incomingOrder.quantity > 0)
-        {
+        if (incomingOrder.fillOrKill && incomingOrder.quantity > 0) {
             incomingOrder.quantity = 0; // Cancel the order
             std::cout << "Fill-or-kill order ID " << incomingOrder.orderId << " was cancelled.\n";
         }
 
         // Add remaining quantities to the same side order book
-        if (incomingOrder.quantity > 0)
-        {
+        if (incomingOrder.quantity > 0) {
             OrderNode newNode(incomingOrder);
             auto      it = sameSideOrders[incomingOrder.price].insert(
                 sameSideOrders[incomingOrder.price].end(), newNode);
@@ -246,8 +225,7 @@ class OrderBook
         if (order.quantity <= 0)
             return;
 
-        if (orderLookup.find(order.orderId) != orderLookup.end())
-        {
+        if (orderLookup.find(order.orderId) != orderLookup.end()) {
             std::cerr << "Order ID " << order.orderId << " already exists.\n";
             return;
         }
@@ -261,15 +239,12 @@ class OrderBook
         std::lock_guard<std::mutex> lock(bookMutex);
 
         auto it = orderLookup.find(orderId);
-        if (it != orderLookup.end())
-        {
+        if (it != orderLookup.end()) {
             auto& orderNode = it->second;
             orderNode.orderList->erase(orderNode.it);
             orderLookup.erase(it);
             std::cout << "Order ID " << orderId << " was cancelled.\n";
-        }
-        else
-        {
+        } else {
             std::cerr << "Order ID " << orderId << " not found.\n";
         }
     }
