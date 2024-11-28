@@ -45,24 +45,25 @@ void testTwo()
 void testFunction()
 {
     customAssert(true); // Example test case
+}
 
-    // Testing function runner
-    void runTests()
-    {
-        vector<string> testResults;
+// Testing function runner
+void runTests()
+{
+    vector<string> testResults;
 
-        // Add test functions here
-        testResults.push_back(runTest("testFunction", testFunction));
-        testResults.push_back(runTest("testTwo", testTwo));
+    // Add test functions here
+    testResults.push_back(runTest("testFunction", testFunction));
+    testResults.push_back(runTest("testTwo", testTwo));
 
-        // Print test results
-        for (const auto& result : testResults) {
-            cout << result << endl;
-        }
+    // Print test results
+    for (const auto& result : testResults) {
+        cout << result << endl;
     }
+}
 
-    int main()
-    {
-        runTests();
-        return 0;
-    }
+int main()
+{
+    runTests();
+    return 0;
+}
