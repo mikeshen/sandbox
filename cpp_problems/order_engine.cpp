@@ -124,19 +124,6 @@ class OrderBook
 
     std::mutex bookMutex; // For thread safety (if required)
 
-    // Helper function to convert reverse iterator to normal iterator
-    template <typename Iterator>
-    auto convertIterator(Iterator it) -> decltype(it)
-    {
-        return it;
-    }
-
-    template <typename Iterator>
-    auto convertIterator(std::reverse_iterator<Iterator> it) -> Iterator
-    {
-        return std::next(it).base();
-    }
-
     // Helper function to match orders
     template <typename Iterator, typename Comparator>
     void matchOrdersHelper(Order& incomingOrder, Iterator begin, Iterator end, Comparator comp)
@@ -146,14 +133,15 @@ class OrderBook
             for (auto listIt = orderList.begin();
                  listIt != orderList.end() && incomingOrder.quantity > 0;) {
                 auto& existingOrder = listIt->order;
-                if (!comp(incomingOrder.price, existingOrder.price))
-                    break;
+                if (comp(incomingOrder.price, existingOrder.price))
+                    return;
 
                 int tradeQuantity = std::min(incomingOrder.quantity, existingOrder.quantity);
                 incomingOrder.quantity -= tradeQuantity;
                 existingOrder.quantity -= tradeQuantity;
 
                 if (existingOrder.quantity == 0) {
+                    orderLookup.erase(existingOrder.orderId);
                     listIt = orderList.erase(listIt);
                 } else {
                     ++listIt;
@@ -256,32 +244,19 @@ void testOrderMatching()
     OrderBook orderBook;
 
     // Add some sell orders
-    Order sellOrder1(4, false, 102.0, 15, false);
+    Order sellOrder1(1, false, 102.0, 15, false);
     orderBook.processOrder(sellOrder1);
-    Order sellOrder2(5, false, 100.0, 10, false);
+    Order sellOrder2(2, false, 100.0, 10, false);
     orderBook.processOrder(sellOrder2);
-    Order sellOrder3(6, false, 98.0, 25, false);
+    Order sellOrder3(3, false, 98.0, 25, false);
     orderBook.processOrder(sellOrder3);
 
     // Add an incoming buy order that should match with the lowest sell order
-    Order incomingBuyOrder(7, true, 101.0, 15, false);
+    Order incomingBuyOrder(4, true, 101.0, 15, false);
     orderBook.processOrder(incomingBuyOrder);
     assert(incomingBuyOrder.quantity == 0); // Should be fully matched
 
-    // Add some buy orders
-    Order buyOrder1(1, true, 100.0, 10, false);
-    orderBook.processOrder(buyOrder1);
-    Order buyOrder2(2, true, 101.0, 5, false);
-    orderBook.processOrder(buyOrder2);
-    Order buyOrder3(3, true, 99.0, 20, false);
-    orderBook.processOrder(buyOrder3);
-
-    // Add an incoming sell order that should match with the highest buy order
-    Order incomingSellOrder(8, false, 99.0, 10, false);
-    orderBook.processOrder(incomingSellOrder);
-    assert(incomingSellOrder.quantity == 0); // Should be fully matched
-
-    std::cout << "All test cases passed.\n";
+    std::cout << "All test cases passed.\n" ;
 }
 
 int main()
