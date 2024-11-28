@@ -11,6 +11,9 @@
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
+#include "test_runner.h"
+
+using namespace std;
 
 class Order
 {
@@ -117,6 +120,9 @@ class OrderBook
         OrderNode() : order(0, false, 0.0, 0, false), orderList(nullptr) {} // Default constructor
     };
 
+    public:
+
+
     // Price -> List of orders at that price
     std::map<double, std::list<OrderNode>> buyOrders;  // Descending price
     std::map<double, std::list<OrderNode>> sellOrders; // Ascending price
@@ -124,6 +130,7 @@ class OrderBook
 
     std::mutex bookMutex; // For thread safety (if required)
 
+    private:
     // Helper function to match orders
     template <typename Iterator, typename Comparator>
     void matchOrdersHelper(Order& incomingOrder, Iterator begin, Iterator end, Comparator comp)
@@ -205,7 +212,7 @@ class OrderBook
         }
     }
 
-   public:
+    public:
     void processOrder(Order& order)
     {
         std::lock_guard<std::mutex> lock(bookMutex);
@@ -229,7 +236,18 @@ class OrderBook
         auto it = orderLookup.find(orderId);
         if (it != orderLookup.end()) {
             auto& orderNode = it->second;
-            orderNode.orderList->erase(orderNode.it);
+            auto& orderList = *orderNode.orderList;
+            orderList.erase(orderNode.it);
+
+            // Remove the price level if the list is empty
+            if (orderList.empty()) {
+                if (orderNode.order.isBuy) {
+                    buyOrders.erase(orderNode.order.price);
+                } else {
+                    sellOrders.erase(orderNode.order.price);
+                }
+            }
+
             orderLookup.erase(it);
             std::cout << "Order ID " << orderId << " was cancelled.\n";
         } else {
@@ -238,29 +256,82 @@ class OrderBook
     }
 };
 
-// Test case
-void testOrderMatching()
-{
+void testAddBuyOrder() {
     OrderBook orderBook;
+    Order order(1, true, 100.0, 10, false);
+    orderBook.processOrder(order);
 
-    // Add some sell orders
-    Order sellOrder1(1, false, 102.0, 15, false);
-    orderBook.processOrder(sellOrder1);
-    Order sellOrder2(2, false, 100.0, 10, false);
-    orderBook.processOrder(sellOrder2);
-    Order sellOrder3(3, false, 98.0, 25, false);
-    orderBook.processOrder(sellOrder3);
-
-    // Add an incoming buy order that should match with the lowest sell order
-    Order incomingBuyOrder(4, true, 101.0, 15, false);
-    orderBook.processOrder(incomingBuyOrder);
-    assert(incomingBuyOrder.quantity == 0); // Should be fully matched
-
-    std::cout << "All test cases passed.\n" ;
+    customAssert(orderBook.buyOrders.size() == 1);
+    customAssert(orderBook.buyOrders.begin()->second.size() == 1);
+    customAssert(orderBook.orderLookup.size() == 1);
 }
 
-int main()
-{
-    testOrderMatching();
+void testAddSellOrder() {
+    OrderBook orderBook;
+    Order order(2, false, 50.0, 5, false);
+    orderBook.processOrder(order);
+
+    customAssert(orderBook.sellOrders.size() == 1);
+    customAssert(orderBook.sellOrders.begin()->second.size() == 1);
+    customAssert(orderBook.orderLookup.size() == 1);
+}
+
+void testMatchOrders() {
+    OrderBook orderBook;
+    Order buyOrder(1, true, 100.0, 10, false);
+    Order sellOrder(2, false, 90.0, 5, false);
+
+    orderBook.processOrder(buyOrder);
+    orderBook.processOrder(sellOrder);
+
+    customAssert(orderBook.buyOrders.size() == 1);
+    customAssert(orderBook.buyOrders.begin()->second.begin()->order.quantity == 5);
+    customAssert(orderBook.sellOrders.size() == 0);
+    customAssert(orderBook.orderLookup.size() == 1);
+}
+
+void testFillOrKillOrder() {
+    OrderBook orderBook;
+    Order buyOrder(1, true, 100.0, 10, false);
+    Order sellOrder(2, false, 90.0, 5, false);
+    Order fillOrKillOrder(3, true, 95.0, 10, true);
+
+    orderBook.processOrder(buyOrder);
+    orderBook.processOrder(sellOrder);
+    orderBook.processOrder(fillOrKillOrder);
+
+    customAssert(orderBook.buyOrders.size() == 1);
+    customAssert(orderBook.buyOrders.begin()->second.begin()->order.quantity == 5);
+    customAssert(orderBook.sellOrders.size() == 0);
+    customAssert(orderBook.orderLookup.size() == 1);
+}
+
+void testCancelOrder() {
+    OrderBook orderBook;
+    Order order(1, true, 100.0, 10, false);
+    orderBook.processOrder(order);
+    orderBook.cancelOrder(1);
+
+    customAssert(orderBook.buyOrders.size() == 0);
+    customAssert(orderBook.orderLookup.size() == 0);
+}
+
+void runTests() {
+    vector<string> testResults;
+
+    testResults.push_back(runTest("testAddBuyOrder", testAddBuyOrder));
+    testResults.push_back(runTest("testAddSellOrder", testAddSellOrder));
+    testResults.push_back(runTest("testMatchOrders", testMatchOrders));
+    testResults.push_back(runTest("testFillOrKillOrder", testFillOrKillOrder));
+    testResults.push_back(runTest("testCancelOrder", testCancelOrder));
+
+    // Print test results
+    for (const auto& result : testResults) {
+        cout << result << endl;
+    }
+}
+
+int main() {
+    runTests();
     return 0;
 }
