@@ -41,12 +41,6 @@ void testTwo()
     customAssert(2 == two); // Example test case
 }
 
-// dummy test function example
-void testFunction()
-{
-    customAssert(true); // Example test case
-}
-
 // Testing function runner
 void runTests()
 {
