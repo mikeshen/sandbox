@@ -1,10 +1,10 @@
-#include <iostream>
-#include <vector>
-#include <deque>
-#include <unordered_map>
-#include <cmath>
-#include <mutex>
 #include <chrono>
+#include <cmath>
+#include <deque>
+#include <iostream>
+#include <mutex>
+#include <unordered_map>
+#include <vector>
 
 /*
 Follow-up Questions
@@ -29,27 +29,29 @@ Time Complexity:
 
 struct TickData {
     double price;
-    int timestamp;
+    int    timestamp;
     double volume;
 };
 
-class MarketData {
+class MarketData
+{
     struct SymbolStats {
         std::deque<TickData> tickWindow;
-        std::deque<double> squaredReturnsWindow;
-        double sumPrice{0.0};
-        double sumVolume{0.0};
-        double sumSquaredReturns{0.0};
-        double previousPrice{0.0};
-        std::mutex mtx;
+        std::deque<double>   squaredReturnsWindow;
+        double               sumPrice{0.0};
+        double               sumVolume{0.0};
+        double               sumSquaredReturns{0.0};
+        double               previousPrice{0.0};
+        std::mutex           mtx;
     };
 
     std::unordered_map<std::string, SymbolStats> symbolData;
     const double ANOMALY_THRESHOLD = 0.1; // 10% price change threshold
 
-public:
-    void process_tick(const std::string& symbol, double price, int timestamp, double volume = 1.0) {
-        auto& stats = symbolData[symbol];
+   public:
+    void process_tick(const std::string& symbol, double price, int timestamp, double volume = 1.0)
+    {
+        auto&                       stats = symbolData[symbol];
         std::lock_guard<std::mutex> lock(stats.mtx);
 
         // Anomaly detection
@@ -68,7 +70,7 @@ public:
 
         // Update volatility metrics
         if (stats.previousPrice > 0) {
-            double return_ = std::log(price / stats.previousPrice);
+            double return_       = std::log(price / stats.previousPrice);
             double squaredReturn = return_ * return_;
             stats.sumSquaredReturns += squaredReturn;
             stats.squaredReturnsWindow.push_back(squaredReturn);
@@ -79,19 +81,23 @@ public:
         cleanup_old_ticks(stats, timestamp);
     }
 
-    double get_vwap(const std::string& symbol) {
-        auto& stats = symbolData[symbol];
+    double get_vwap(const std::string& symbol)
+    {
+        auto&                       stats = symbolData[symbol];
         std::lock_guard<std::mutex> lock(stats.mtx);
 
-        if (stats.sumVolume == 0) return 0.0;
+        if (stats.sumVolume == 0)
+            return 0.0;
         return stats.sumPrice / stats.sumVolume;
     }
 
-    double get_price_volatility(const std::string& symbol, size_t window_ticks) {
-        auto& stats = symbolData[symbol];
+    double get_price_volatility(const std::string& symbol, size_t window_ticks)
+    {
+        auto&                       stats = symbolData[symbol];
         std::lock_guard<std::mutex> lock(stats.mtx);
 
-        if (stats.squaredReturnsWindow.size() < 2) return 0.0;
+        if (stats.squaredReturnsWindow.size() < 2)
+            return 0.0;
 
         // Adjust sumSquaredReturns to reflect only the last window_ticks returns
         while (stats.squaredReturnsWindow.size() > window_ticks) {
@@ -102,9 +108,11 @@ public:
         return std::sqrt(stats.sumSquaredReturns / (stats.squaredReturnsWindow.size() - 1));
     }
 
-private:
-    void cleanup_old_ticks(SymbolStats& stats, int currentTime) {
-        while (!stats.tickWindow.empty() && currentTime - stats.tickWindow.front().timestamp > 3600) {
+   private:
+    void cleanup_old_ticks(SymbolStats& stats, int currentTime)
+    {
+        while (!stats.tickWindow.empty() &&
+               currentTime - stats.tickWindow.front().timestamp > 3600) {
             const auto& oldTick = stats.tickWindow.front();
             stats.sumPrice -= oldTick.price * oldTick.volume;
             stats.sumVolume -= oldTick.volume;
@@ -113,6 +121,7 @@ private:
     }
 };
 
-int main() {
+int main()
+{
     return 0;
 }

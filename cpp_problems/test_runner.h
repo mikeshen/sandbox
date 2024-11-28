@@ -1,17 +1,18 @@
-#include <functional>
-#include <string>
 #include <exception>
+#include <functional>
 #include <sstream>
+#include <string>
 
-#define customAssert(condition) \
-    if (!(condition)) { \
-        std::ostringstream oss; \
+#define customAssert(condition)                    \
+    if (!(condition)) {                            \
+        std::ostringstream oss;                    \
         oss << "Assertion failed: " << #condition; \
-        throw std::logic_error(oss.str()); \
+        throw std::logic_error(oss.str());         \
     }
 
 // Helper function to run a test and catch exceptions
-std::string runTest(const std::string& testName, std::function<void()> testFunc) {
+std::string runTest(const std::string& testName, std::function<void()> testFunc)
+{
     try {
         testFunc();
         return testName + ": PASSED";
@@ -23,4 +24,3 @@ std::string runTest(const std::string& testName, std::function<void()> testFunc)
         return testName + ": FAILED with unknown exception";
     }
 }
-

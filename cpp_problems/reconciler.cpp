@@ -10,41 +10,39 @@ truth. We want to find the delta on what D1 shows vs that.
 
 */
 
-unordered_map<string, double> parsePositions(const vector<string>& positions) {
+unordered_map<string, double> parsePositions(const vector<string>& positions)
+{
     unordered_map<string, double> posMap;
     for (const auto& pos : positions) {
         istringstream ss(pos);
-        string symbol;
-        double amount;
+        string        symbol;
+        double        amount;
         ss >> symbol >> amount;
         posMap[symbol] = amount;
     }
     return posMap;
 }
 
-vector<string> reconcilePositions(
-        vector<string> d0_pos,
-        vector<string> d1_trn,
-        vector<string> d1_pos
-        ) {
+vector<string>
+reconcilePositions(vector<string> d0_pos, vector<string> d1_trn, vector<string> d1_pos)
+{
     vector<string> discrepancies;
     // 1. parse positions
-    unordered_map<string, double> d0Map = parsePositions(d0_pos);
-    unordered_map<string, double> d1Map = parsePositions(d1_pos);
+    unordered_map<string, double> d0Map       = parsePositions(d0_pos);
+    unordered_map<string, double> d1Map       = parsePositions(d1_pos);
     unordered_map<string, double> expectedMap = d0Map;
 
     // 2. process trxns
     for (const string& trn : d1_trn) {
         istringstream ss(trn);
-        string symbol, type;
-        int units;
-        double value;
+        string        symbol, type;
+        int           units;
+        double        value;
         ss >> symbol >> type >> units >> value;
         if (type == "BY") {
             expectedMap[symbol] += units;
             expectedMap["Cash"] -= value;
-        }
-        else if (type == "SL") {
+        } else if (type == "SL") {
             expectedMap[symbol] -= units;
             expectedMap["Cash"] += value;
         }
@@ -52,9 +50,9 @@ vector<string> reconcilePositions(
 
     // 3. discrepancies
     for (const auto& kv : expectedMap) {
-        string symbol = kv.first;
+        string symbol         = kv.first;
         double expectedAmount = kv.second;
-        double actualAmount = d1Map[symbol];
+        double actualAmount   = d1Map[symbol];
         if (expectedAmount != actualAmount) {
             ostringstream discrepancy;
             discrepancy << symbol << " " << (actualAmount - expectedAmount);
@@ -65,7 +63,7 @@ vector<string> reconcilePositions(
     for (const auto& kv : d1Map) {
         string symbol = kv.first;
         if (expectedMap.find(symbol) == expectedMap.end()) {
-            double actualAmount = kv.second;
+            double        actualAmount = kv.second;
             ostringstream discrepancy;
             discrepancy << symbol << " " << actualAmount;
             discrepancies.push_back((discrepancy.str()));
@@ -75,7 +73,8 @@ vector<string> reconcilePositions(
     return discrepancies;
 }
 
-string basic() {
+string basic()
+{
     vector<string> d0_pos = {"AAPL 100", "GOOG 200", "Cash 10"};
     vector<string> d1_trn = {"AAPL SL 50 30000", "GOOG BY 10 10000"};
     vector<string> d1_pos = {"AAPL 50", "GOOG 220", "Cash 20000"};
@@ -105,9 +104,11 @@ string basic() {
 
 ["Cash -10", "META 5"]  # revised output
 */
-string revised() {
+string revised()
+{
     vector<string> d0_pos = {"AAPL 100", "GOOG 200", "Cash 10"};
-    vector<string> d1_trn = {"AAPL SL 25 15000", "GOOG BY 20 10000", "AAPL SL 25 10000", "META SL 5 5000"};
+    vector<string> d1_trn = {
+        "AAPL SL 25 15000", "GOOG BY 20 10000", "AAPL SL 25 10000", "META SL 5 5000"};
     vector<string> d1_pos = {"AAPL 50", "GOOG 220", "Cash 20000"};
 
     // reconcile positions
@@ -119,7 +120,8 @@ string revised() {
     return "revised";
 }
 
-string correct() {
+string correct()
+{
     vector<string> d0_pos = {"AAPL 100", "GOOG 200", "Cash 10"};
     vector<string> d1_trn = {"AAPL SL 50 30000", "GOOG BY 10 10000"};
     vector<string> d1_pos = {"AAPL 50", "GOOG 210", "Cash 20010"};
@@ -133,7 +135,8 @@ string correct() {
     return "correct";
 }
 
-string correctNoPositions() {
+string correctNoPositions()
+{
     vector<string> d0_pos = {};
     vector<string> d1_trn = {"AAPL BY 50 30000", "GOOG BY 10 10000"};
     vector<string> d1_pos = {"AAPL 50", "GOOG 10", "Cash -40000"};
@@ -147,7 +150,8 @@ string correctNoPositions() {
     return "correctNoPositions";
 }
 
-string discFirstTime() {
+string discFirstTime()
+{
     vector<string> d0_pos = {};
     vector<string> d1_trn = {};
     vector<string> d1_pos = {"AAPL 50", "CASH 10000"};
@@ -161,7 +165,8 @@ string discFirstTime() {
     return "discFirstTime";
 }
 
-void runTests() {
+void runTests()
+{
     string testname = basic();
     cout << testname << endl;
     testname = revised();
@@ -174,7 +179,8 @@ void runTests() {
     cout << testname << endl;
 }
 
-int main() {
+int main()
+{
     runTests();
     return 0;
 }

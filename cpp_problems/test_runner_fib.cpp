@@ -1,15 +1,18 @@
-#include <vector>
 #include <iostream>
+#include <vector>
 #include "test_runner.h"
 
 using namespace std;
 
 // Dynamic programming implementation of Fibonacci sequence
-unsigned long long calcFib(int n) {
-    const int size = 93; // Largest Fibonacci number storable in long long
+unsigned long long calcFib(int n)
+{
+    const int                size = 93;        // Largest Fibonacci number storable in long long
     static vector<long long> dp(size + 1, -1); // Static storage for already calculated figures
-    if (dp[0] == -1) dp[0] = 0; // Initialize base case
-    if (dp[1] == -1) dp[1] = 1; // Initialize base case
+    if (dp[0] == -1)
+        dp[0] = 0; // Initialize base case
+    if (dp[1] == -1)
+        dp[1] = 1; // Initialize base case
     if (dp[n] != -1)
         return dp[n];
     for (int i = 2; i <= n; ++i)
@@ -20,17 +23,20 @@ unsigned long long calcFib(int n) {
 }
 
 // dummy test function example
-void testFunction() {
+void testFunction()
+{
     customAssert(true); // Example test case
 }
 
-void testTwo() {
+void testTwo()
+{
     int two = 2;
     customAssert(2 == two); // Example test case
 }
 
 // Test function for calcFib
-void testCalcFib() {
+void testCalcFib()
+{
     // Test case 1
     customAssert(calcFib(0) == 0);
     // Test case 2
@@ -58,7 +64,8 @@ void testCalcFib() {
 }
 
 // Testing function runner
-void runTests() {
+void runTests()
+{
     vector<string> testResults;
 
     // Add test functions here
@@ -72,7 +79,8 @@ void runTests() {
     }
 }
 
-int main() {
+int main()
+{
     runTests();
     return 0;
 }

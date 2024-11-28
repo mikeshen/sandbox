@@ -1,21 +1,22 @@
-#include <vector>
-#include <iostream>
-#include <functional>
-#include <string>
 #include <exception>
+#include <functional>
+#include <iostream>
 #include <sstream>
+#include <string>
+#include <vector>
 
 using namespace std;
 
-#define customAssert(condition) \
-    if (!(condition)) { \
-        std::ostringstream oss; \
+#define customAssert(condition)                    \
+    if (!(condition)) {                            \
+        std::ostringstream oss;                    \
         oss << "Assertion failed: " << #condition; \
-        throw std::logic_error(oss.str()); \
+        throw std::logic_error(oss.str());         \
     }
 
 // Helper function to run a test and catch exceptions
-std::string runTest(const std::string& testName, std::function<void()> testFunc) {
+std::string runTest(const std::string& testName, std::function<void()> testFunc)
+{
     try {
         testFunc();
         return testName + ": PASSED";
@@ -29,34 +30,39 @@ std::string runTest(const std::string& testName, std::function<void()> testFunc)
 }
 
 // dummy test function example
-void testFunction() {
+void testFunction()
+{
     customAssert(true); // Example test case
 }
 
-void testTwo() {
+void testTwo()
+{
     int two = 2;
     customAssert(2 == two); // Example test case
 }
 
 // dummy test function example
-void testFunction() {
+void testFunction()
+{
     customAssert(true); // Example test case
 
-// Testing function runner
-void runTests() {
-    vector<string> testResults;
+    // Testing function runner
+    void runTests()
+    {
+        vector<string> testResults;
 
-    // Add test functions here
-    testResults.push_back(runTest("testFunction", testFunction));
-    testResults.push_back(runTest("testTwo", testTwo));
+        // Add test functions here
+        testResults.push_back(runTest("testFunction", testFunction));
+        testResults.push_back(runTest("testTwo", testTwo));
 
-    // Print test results
-    for (const auto& result : testResults) {
-        cout << result << endl;
+        // Print test results
+        for (const auto& result : testResults) {
+            cout << result << endl;
+        }
     }
-}
 
-int main() {
-    runTests();
-    return 0;
-}
+    int main()
+    {
+        runTests();
+        return 0;
+    }
