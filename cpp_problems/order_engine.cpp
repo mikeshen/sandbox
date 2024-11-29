@@ -112,7 +112,7 @@ class Order
 class OrderBook
 {
     struct OrderNode {
-        Order                          order;
+        Order                     order;
         list<OrderNode>::iterator it;
         list<OrderNode>*          orderList; // Pointer to the list
 
@@ -122,9 +122,9 @@ class OrderBook
 
    public:
     // Price -> List of orders at that price
-    map<double, list<OrderNode>> buyOrders;  // Descending price
-    map<double, list<OrderNode>> sellOrders; // Ascending price
-    unordered_map<int, OrderNode>     orderLookup;
+    map<double, list<OrderNode>>  buyOrders;  // Descending price
+    map<double, list<OrderNode>>  sellOrders; // Ascending price
+    unordered_map<int, OrderNode> orderLookup;
 
     mutex bookMutex; // For thread safety (if required)
 
@@ -163,10 +163,8 @@ class OrderBook
 
         if (incomingOrder.isBuy) {
             // Start from the lowest price for sell orders
-            matchOrdersHelper(incomingOrder,
-                              matchingOrders.begin(),
-                              matchingOrders.end(),
-                              less_equal<double>());
+            matchOrdersHelper(
+                incomingOrder, matchingOrders.begin(), matchingOrders.end(), less_equal<double>());
 
             // Delete empty levels starting from begin for sellOrders
             for (auto it = matchingOrders.begin(); it != matchingOrders.end();) {

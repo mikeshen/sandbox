@@ -1,34 +1,38 @@
 #include <iostream>
-#include <vector>
-#include <queue>
 #include <limits>
+#include <queue>
+#include <vector>
 #include "test_runner.h"
 
 using namespace std;
 
 const int INF = numeric_limits<int>::max();
 
-class Graph {
-    public:
-        Graph(int vertices);
-        void addEdge(int u, int v, int weight);
-        void dijkstra(int start);
+class Graph
+{
+   public:
+    Graph(int vertices);
+    void addEdge(int u, int v, int weight);
+    void dijkstra(int start);
 
-    private:
-        int vertices;
-        vector<vector<pair<int, int>>> adjList;
+   private:
+    int                            vertices;
+    vector<vector<pair<int, int>>> adjList;
 };
 
-Graph::Graph(int vertices) : vertices(vertices) {
+Graph::Graph(int vertices) : vertices(vertices)
+{
     adjList.resize(vertices);
 }
 
-void Graph::addEdge(int u, int v, int weight) {
+void Graph::addEdge(int u, int v, int weight)
+{
     adjList[u].emplace_back(v, weight);
     adjList[v].emplace_back(u, weight); // For undirected graph
 }
 
-void Graph::dijkstra(int start) {
+void Graph::dijkstra(int start)
+{
     vector<int> dist(vertices, INF);
     dist[start] = 0;
 
@@ -40,7 +44,7 @@ void Graph::dijkstra(int start) {
         pq.pop();
 
         for (const auto& neighbor : adjList[u]) {
-            int v = neighbor.first;
+            int v      = neighbor.first;
             int weight = neighbor.second;
 
             if (dist[u] + weight < dist[v]) {
@@ -56,8 +60,9 @@ void Graph::dijkstra(int start) {
     }
 }
 
-void testDjikstra() {
-    int vertices = 5;
+void testDjikstra()
+{
+    int   vertices = 5;
     Graph g(vertices);
 
     g.addEdge(0, 1, 4);
@@ -72,7 +77,8 @@ void testDjikstra() {
     g.dijkstra(startVertex);
 }
 
-void runTests() {
+void runTests()
+{
     vector<string> testResults;
     testResults.push_back(runTest("testDjikstra", testDjikstra));
 
@@ -82,7 +88,8 @@ void runTests() {
     }
 }
 
-int main() {
+int main()
+{
     runTests();
 
     return 0;

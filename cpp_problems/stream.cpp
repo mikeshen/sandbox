@@ -133,8 +133,8 @@ class Buffer
             Payload payload = parsePayload(buffer_ + headerSize_, header.getPayloadSize());
 
             // Store or handle processed message
-            cout << "Received message: " << header.getMessageType() << " - "
-                      << payload.getData() << endl;
+            cout << "Received message: " << header.getMessageType() << " - " << payload.getData()
+                 << endl;
         } catch (const exception& e) {
             cerr << "Error processing message: " << e.what() << endl;
         }

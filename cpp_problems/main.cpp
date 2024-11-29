@@ -1,21 +1,22 @@
-#include <vector>
-#include <iostream>
-#include <functional>
-#include <string>
 #include <exception>
+#include <functional>
+#include <iostream>
 #include <sstream>
+#include <string>
+#include <vector>
 
 using namespace std;
 
-#define customAssert(condition) \
-    if (!(condition)) { \
-        ostringstream oss; \
+#define customAssert(condition)                    \
+    if (!(condition)) {                            \
+        ostringstream oss;                         \
         oss << "Assertion failed: " << #condition; \
-        throw logic_error(oss.str()); \
+        throw logic_error(oss.str());              \
     }
 
 // Helper function to run a test and catch exceptions
-string runTest(const string& testName, function<void()> testFunc) {
+string runTest(const string& testName, function<void()> testFunc)
+{
     try {
         testFunc();
         return testName + ": PASSED";
@@ -29,16 +30,19 @@ string runTest(const string& testName, function<void()> testFunc) {
 }
 
 // dummy test function example
-void testFunction() {
+void testFunction()
+{
     customAssert(true); // Example test case
 }
 
-void addTwo() {
-    customAssert(2+2==4); // Example test case
+void addTwo()
+{
+    customAssert(2 + 2 == 4); // Example test case
 }
 
 // Testing function runner
-void runTests() {
+void runTests()
+{
     vector<string> testResults;
 
     // Add test functions here
@@ -51,7 +55,8 @@ void runTests() {
     }
 }
 
-int main() {
+int main()
+{
     runTests();
     return 0;
 }

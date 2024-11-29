@@ -9,9 +9,9 @@ using namespace std;
 
 #define customAssert(condition)                    \
     if (!(condition)) {                            \
-        ostringstream oss;                    \
+        ostringstream oss;                         \
         oss << "Assertion failed: " << #condition; \
-        throw logic_error(oss.str());         \
+        throw logic_error(oss.str());              \
     }
 
 // Helper function to run a test and catch exceptions

@@ -10,9 +10,8 @@ string processString(const string& str)
                  result.end());
 
     // Convert to lowercase
-    transform(result.begin(), result.end(), result.begin(), [](unsigned char c) {
-        return tolower(c);
-    });
+    transform(
+        result.begin(), result.end(), result.begin(), [](unsigned char c) { return tolower(c); });
 
     return result;
 }

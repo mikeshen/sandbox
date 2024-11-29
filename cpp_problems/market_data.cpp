@@ -40,20 +40,20 @@ class MarketData
     struct SymbolStats {
         deque<TickData> tickWindow;
         deque<double>   squaredReturnsWindow;
-        double               sumPrice{0.0};
-        double               sumVolume{0.0};
-        double               sumSquaredReturns{0.0};
-        double               previousPrice{0.0};
+        double          sumPrice{0.0};
+        double          sumVolume{0.0};
+        double          sumSquaredReturns{0.0};
+        double          previousPrice{0.0};
         mutex           mtx;
     };
 
     unordered_map<string, SymbolStats> symbolData;
-    const double ANOMALY_THRESHOLD = 0.1; // 10% price change threshold
+    const double                       ANOMALY_THRESHOLD = 0.1; // 10% price change threshold
 
    public:
     void process_tick(const string& symbol, double price, int timestamp, double volume = 1.0)
     {
-        auto&                       stats = symbolData[symbol];
+        auto&             stats = symbolData[symbol];
         lock_guard<mutex> lock(stats.mtx);
 
         // Anomaly detection
@@ -85,7 +85,7 @@ class MarketData
 
     double get_vwap(const string& symbol)
     {
-        auto&                       stats = symbolData[symbol];
+        auto&             stats = symbolData[symbol];
         lock_guard<mutex> lock(stats.mtx);
 
         if (stats.sumVolume == 0)
@@ -95,7 +95,7 @@ class MarketData
 
     double get_price_volatility(const string& symbol, size_t window_ticks)
     {
-        auto&                       stats = symbolData[symbol];
+        auto&             stats = symbolData[symbol];
         lock_guard<mutex> lock(stats.mtx);
 
         if (stats.squaredReturnsWindow.size() < 2)
