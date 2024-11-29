@@ -24,7 +24,7 @@ using namespace std;
 
 #define DEBUG 1
 #ifdef DEBUG
-#define DM(str) do { std::cout << str << std::endl; } while( false )
+#define DM(str) do { cout << str << endl; } while( false )
 #else
 #define DM(str) do { } while ( false )
 #endif

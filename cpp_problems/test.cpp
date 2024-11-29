@@ -9,20 +9,20 @@ using namespace std;
 
 #define customAssert(condition)                    \
     if (!(condition)) {                            \
-        std::ostringstream oss;                    \
+        ostringstream oss;                    \
         oss << "Assertion failed: " << #condition; \
-        throw std::logic_error(oss.str());         \
+        throw logic_error(oss.str());         \
     }
 
 // Helper function to run a test and catch exceptions
-std::string runTest(const std::string& testName, std::function<void()> testFunc)
+string runTest(const string& testName, function<void()> testFunc)
 {
     try {
         testFunc();
         return testName + ": PASSED";
-    } catch (const std::logic_error& e) {
+    } catch (const logic_error& e) {
         return testName + ": FAILED with assertion: " + e.what();
-    } catch (const std::exception& e) {
+    } catch (const exception& e) {
         return testName + ": FAILED with exception: " + e.what();
     } catch (...) {
         return testName + ": FAILED with unknown exception";

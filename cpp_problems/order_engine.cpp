@@ -23,7 +23,7 @@ class Order
     double price; // Price for limit orders, ignored for market orders
     int    quantity;
     bool   fillOrKill; // True for fill-or-kill orders
-    std::chrono::time_point<std::chrono::steady_clock> timestamp;
+    chrono::time_point<chrono::steady_clock> timestamp;
 
     // Default constructor
     Order()
@@ -32,7 +32,7 @@ class Order
           price(0.0),
           quantity(0),
           fillOrKill(false),
-          timestamp(std::chrono::steady_clock::now())
+          timestamp(chrono::steady_clock::now())
     {
     }
 
@@ -43,7 +43,7 @@ class Order
           price(p),
           quantity(q),
           fillOrKill(fok),
-          timestamp(std::chrono::steady_clock::now())
+          timestamp(chrono::steady_clock::now())
     {
     }
 
@@ -65,7 +65,7 @@ class Order
           price(other.price),
           quantity(other.quantity),
           fillOrKill(other.fillOrKill),
-          timestamp(std::move(other.timestamp))
+          timestamp(move(other.timestamp))
     {
         other.orderId    = 0;
         other.isBuy      = false;
@@ -97,7 +97,7 @@ class Order
             price      = other.price;
             quantity   = other.quantity;
             fillOrKill = other.fillOrKill;
-            timestamp  = std::move(other.timestamp);
+            timestamp  = move(other.timestamp);
 
             other.orderId    = 0;
             other.isBuy      = false;
@@ -113,8 +113,8 @@ class OrderBook
 {
     struct OrderNode {
         Order                          order;
-        std::list<OrderNode>::iterator it;
-        std::list<OrderNode>*          orderList; // Pointer to the list
+        list<OrderNode>::iterator it;
+        list<OrderNode>*          orderList; // Pointer to the list
 
         OrderNode(const Order& o) : order(o), orderList(nullptr) {}
         OrderNode() : order(0, false, 0.0, 0, false), orderList(nullptr) {} // Default constructor
@@ -122,11 +122,11 @@ class OrderBook
 
    public:
     // Price -> List of orders at that price
-    std::map<double, std::list<OrderNode>> buyOrders;  // Descending price
-    std::map<double, std::list<OrderNode>> sellOrders; // Ascending price
-    std::unordered_map<int, OrderNode>     orderLookup;
+    map<double, list<OrderNode>> buyOrders;  // Descending price
+    map<double, list<OrderNode>> sellOrders; // Ascending price
+    unordered_map<int, OrderNode>     orderLookup;
 
-    std::mutex bookMutex; // For thread safety (if required)
+    mutex bookMutex; // For thread safety (if required)
 
    private:
     // Helper function to match orders
@@ -141,7 +141,7 @@ class OrderBook
                 if (comp(incomingOrder.price, existingOrder.price))
                     return;
 
-                int tradeQuantity = std::min(incomingOrder.quantity, existingOrder.quantity);
+                int tradeQuantity = min(incomingOrder.quantity, existingOrder.quantity);
                 incomingOrder.quantity -= tradeQuantity;
                 existingOrder.quantity -= tradeQuantity;
 
@@ -166,7 +166,7 @@ class OrderBook
             matchOrdersHelper(incomingOrder,
                               matchingOrders.begin(),
                               matchingOrders.end(),
-                              std::less_equal<double>());
+                              less_equal<double>());
 
             // Delete empty levels starting from begin for sellOrders
             for (auto it = matchingOrders.begin(); it != matchingOrders.end();) {
@@ -181,12 +181,12 @@ class OrderBook
             matchOrdersHelper(incomingOrder,
                               matchingOrders.rbegin(),
                               matchingOrders.rend(),
-                              std::greater_equal<double>());
+                              greater_equal<double>());
 
             // Delete empty levels starting from rbegin for buyOrders
             for (auto it = matchingOrders.rbegin(); it != matchingOrders.rend();) {
                 if (it->second.empty()) {
-                    it = decltype(it)(matchingOrders.erase(std::next(it).base()));
+                    it = decltype(it)(matchingOrders.erase(next(it).base()));
                 } else {
                     ++it;
                 }
@@ -196,7 +196,7 @@ class OrderBook
         // Handle remaining quantities for fill-or-kill orders
         if (incomingOrder.fillOrKill && incomingOrder.quantity > 0) {
             incomingOrder.quantity = 0; // Cancel the order
-            std::cout << "Fill-or-kill order ID " << incomingOrder.orderId << " was cancelled.\n";
+            cout << "Fill-or-kill order ID " << incomingOrder.orderId << " was cancelled.\n";
         }
 
         // Add remaining quantities to the same side order book
@@ -213,13 +213,13 @@ class OrderBook
    public:
     void processOrder(Order& order)
     {
-        std::lock_guard<std::mutex> lock(bookMutex);
+        lock_guard<mutex> lock(bookMutex);
 
         if (order.quantity <= 0)
             return;
 
         if (orderLookup.find(order.orderId) != orderLookup.end()) {
-            std::cerr << "Order ID " << order.orderId << " already exists.\n";
+            cerr << "Order ID " << order.orderId << " already exists.\n";
             return;
         }
 
@@ -229,7 +229,7 @@ class OrderBook
 
     void cancelOrder(int orderId)
     {
-        std::lock_guard<std::mutex> lock(bookMutex);
+        lock_guard<mutex> lock(bookMutex);
 
         auto it = orderLookup.find(orderId);
         if (it != orderLookup.end()) {
@@ -247,9 +247,9 @@ class OrderBook
             }
 
             orderLookup.erase(it);
-            std::cout << "Order ID " << orderId << " was cancelled.\n";
+            cout << "Order ID " << orderId << " was cancelled.\n";
         } else {
-            std::cerr << "Order ID " << orderId << " not found.\n";
+            cerr << "Order ID " << orderId << " not found.\n";
         }
     }
 };

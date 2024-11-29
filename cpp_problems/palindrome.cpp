@@ -1,7 +1,7 @@
 #include "template.h"
 #include "test_runner.h"
 
-string processString(const std::string& str)
+string processString(const string& str)
 {
     string result = str;
 
@@ -10,8 +10,8 @@ string processString(const std::string& str)
                  result.end());
 
     // Convert to lowercase
-    std::transform(result.begin(), result.end(), result.begin(), [](unsigned char c) {
-        return std::tolower(c);
+    transform(result.begin(), result.end(), result.begin(), [](unsigned char c) {
+        return tolower(c);
     });
 
     return result;

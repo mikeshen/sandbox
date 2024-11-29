@@ -26,21 +26,21 @@ class Buffer
     {
         int epfd = epoll_create1(0);
         if (epfd < 0) {
-            throw std::runtime_error("Failed to create epoll instance");
+            throw runtime_error("Failed to create epoll instance");
         }
 
         struct epoll_event event;
         event.events  = EPOLLIN;
         event.data.fd = socket;
         if (epoll_ctl(epfd, EPOLL_CTL_ADD, socket, &event) < 0) {
-            throw std::runtime_error("Failed to add socket to epoll");
+            throw runtime_error("Failed to add socket to epoll");
         }
 
         while (true) {
             struct epoll_event events[1];
             int                num_events = epoll_wait(epfd, events, 1, 1000); // 1-second timeout
             if (num_events < 0) {
-                throw std::runtime_error("Failed to wait for epoll events");
+                throw runtime_error("Failed to wait for epoll events");
             }
 
             if (num_events == 0) {
@@ -51,7 +51,7 @@ class Buffer
                 char temp[bufferSize_];
                 int  bytes_received = recv(socket, temp, sizeof(temp), 0);
                 if (bytes_received < 0) {
-                    throw std::runtime_error("Failed to receive data");
+                    throw runtime_error("Failed to receive data");
                 }
 
                 if (bytes_received == 0) {
@@ -67,7 +67,7 @@ class Buffer
                     if (bytesReceived_ >= messageSize) {
                         processMessage();
                         bytesReceived_ -= messageSize;
-                        std::memmove(buffer_, buffer_ + messageSize, bytesReceived_);
+                        memmove(buffer_, buffer_ + messageSize, bytesReceived_);
                     } else {
                         break;
                     }
@@ -104,11 +104,11 @@ class Buffer
     };
 
     struct Payload {
-        std::string data;
+        string data;
 
-        Payload(const std::string& data) : data(data) {}
+        Payload(const string& data) : data(data) {}
 
-        std::string getData() const
+        string getData() const
         {
             return data;
         }
@@ -117,7 +117,7 @@ class Buffer
     int getMessageSize()
     {
         if (bytesReceived_ < headerSize_) {
-            throw std::runtime_error("Not enough data to determine message size");
+            throw runtime_error("Not enough data to determine message size");
         }
         Header header = parseHeader(buffer_, headerSize_);
         return headerSize_ + header.getPayloadSize();
@@ -133,28 +133,28 @@ class Buffer
             Payload payload = parsePayload(buffer_ + headerSize_, header.getPayloadSize());
 
             // Store or handle processed message
-            std::cout << "Received message: " << header.getMessageType() << " - "
-                      << payload.getData() << std::endl;
-        } catch (const std::exception& e) {
-            std::cerr << "Error processing message: " << e.what() << std::endl;
+            cout << "Received message: " << header.getMessageType() << " - "
+                      << payload.getData() << endl;
+        } catch (const exception& e) {
+            cerr << "Error processing message: " << e.what() << endl;
         }
     }
 
     Header parseHeader(char* buffer, int headerSize)
     {
         if (headerSize != 8) {
-            throw std::runtime_error("Invalid header size");
+            throw runtime_error("Invalid header size");
         }
         int messageType;
         int payloadSize;
-        std::memcpy(&messageType, buffer, 4);
-        std::memcpy(&payloadSize, buffer + 4, 4);
+        memcpy(&messageType, buffer, 4);
+        memcpy(&payloadSize, buffer + 4, 4);
         return Header(ntohl(messageType), ntohl(payloadSize));
     }
 
     Payload parsePayload(char* buffer, int payloadSize)
     {
-        return Payload(std::string(buffer, payloadSize));
+        return Payload(string(buffer, payloadSize));
     }
 };
 
@@ -163,7 +163,7 @@ int createSocket()
     // Initialize socket
     int socket = ::socket(AF_INET, SOCK_STREAM, 0);
     if (socket < 0) {
-        throw std::runtime_error("Failed to create socket");
+        throw runtime_error("Failed to create socket");
     }
 
     // Set up server address
@@ -174,7 +174,7 @@ int createSocket()
 
     // Connect to server
     if (connect(socket, (sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) {
-        throw std::runtime_error("Failed to connect to server");
+        throw runtime_error("Failed to connect to server");
     }
 
     return socket;
@@ -183,7 +183,7 @@ int createSocket()
 void closeSocket(int socket)
 {
     if (close(socket) < 0) {
-        std::cerr << "Error closing socket" << std::endl;
+        cerr << "Error closing socket" << endl;
     }
 }
 
@@ -192,14 +192,14 @@ int main()
     try {
         int socket = createSocket();
         if (socket < 0) {
-            throw std::runtime_error("Error creating socket");
+            throw runtime_error("Error creating socket");
         }
 
         Buffer buffer(1024);
         buffer.recvData(socket);
         closeSocket(socket);
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+    } catch (const exception& e) {
+        cerr << "Error: " << e.what() << endl;
         return 1;
     }
     return 0;

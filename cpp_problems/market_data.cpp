@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <vector>
 
+using namespace std;
+
 /*
 Follow-up Questions
 
@@ -36,27 +38,27 @@ struct TickData {
 class MarketData
 {
     struct SymbolStats {
-        std::deque<TickData> tickWindow;
-        std::deque<double>   squaredReturnsWindow;
+        deque<TickData> tickWindow;
+        deque<double>   squaredReturnsWindow;
         double               sumPrice{0.0};
         double               sumVolume{0.0};
         double               sumSquaredReturns{0.0};
         double               previousPrice{0.0};
-        std::mutex           mtx;
+        mutex           mtx;
     };
 
-    std::unordered_map<std::string, SymbolStats> symbolData;
+    unordered_map<string, SymbolStats> symbolData;
     const double ANOMALY_THRESHOLD = 0.1; // 10% price change threshold
 
    public:
-    void process_tick(const std::string& symbol, double price, int timestamp, double volume = 1.0)
+    void process_tick(const string& symbol, double price, int timestamp, double volume = 1.0)
     {
         auto&                       stats = symbolData[symbol];
-        std::lock_guard<std::mutex> lock(stats.mtx);
+        lock_guard<mutex> lock(stats.mtx);
 
         // Anomaly detection
         if (stats.previousPrice > 0) {
-            double priceChange = std::abs(price - stats.previousPrice) / stats.previousPrice;
+            double priceChange = abs(price - stats.previousPrice) / stats.previousPrice;
             if (priceChange > ANOMALY_THRESHOLD) {
                 // Handle anomaly - could log, reject, or adjust
                 return;
@@ -70,7 +72,7 @@ class MarketData
 
         // Update volatility metrics
         if (stats.previousPrice > 0) {
-            double return_       = std::log(price / stats.previousPrice);
+            double return_       = log(price / stats.previousPrice);
             double squaredReturn = return_ * return_;
             stats.sumSquaredReturns += squaredReturn;
             stats.squaredReturnsWindow.push_back(squaredReturn);
@@ -81,20 +83,20 @@ class MarketData
         cleanup_old_ticks(stats, timestamp);
     }
 
-    double get_vwap(const std::string& symbol)
+    double get_vwap(const string& symbol)
     {
         auto&                       stats = symbolData[symbol];
-        std::lock_guard<std::mutex> lock(stats.mtx);
+        lock_guard<mutex> lock(stats.mtx);
 
         if (stats.sumVolume == 0)
             return 0.0;
         return stats.sumPrice / stats.sumVolume;
     }
 
-    double get_price_volatility(const std::string& symbol, size_t window_ticks)
+    double get_price_volatility(const string& symbol, size_t window_ticks)
     {
         auto&                       stats = symbolData[symbol];
-        std::lock_guard<std::mutex> lock(stats.mtx);
+        lock_guard<mutex> lock(stats.mtx);
 
         if (stats.squaredReturnsWindow.size() < 2)
             return 0.0;
@@ -105,7 +107,7 @@ class MarketData
             stats.squaredReturnsWindow.pop_front();
         }
 
-        return std::sqrt(stats.sumSquaredReturns / (stats.squaredReturnsWindow.size() - 1));
+        return sqrt(stats.sumSquaredReturns / (stats.squaredReturnsWindow.size() - 1));
     }
 
    private:
