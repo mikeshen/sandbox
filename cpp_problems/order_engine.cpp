@@ -126,9 +126,10 @@ class OrderBook
     map<double, list<OrderNode>>  sellOrders; // Ascending price
     unordered_map<int, OrderNode> orderLookup;
 
-    mutex bookMutex; // For thread safety (if required)
 
    private:
+    mutex bookMutex; // For thread safety (if required)
+
     // Helper function to match orders
     template <typename Iterator, typename Comparator>
     void matchOrdersHelper(Order& incomingOrder, Iterator begin, Iterator end, Comparator comp)
