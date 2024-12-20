@@ -122,10 +122,9 @@ class OrderBook
 
    public:
     // Price -> List of orders at that price
-    map<double, list<OrderNode>>  buyOrders;  // Descending price
-    map<double, list<OrderNode>>  sellOrders; // Ascending price
+    map<double, list<OrderNode>>  buyOrders;
+    map<double, list<OrderNode>>  sellOrders;
     unordered_map<int, OrderNode> orderLookup;
-
 
    private:
     mutex bookMutex; // For thread safety (if required)
@@ -149,8 +148,9 @@ class OrderBook
                 if (existingOrder.quantity == 0) {
                     orderLookup.erase(existingOrder.orderId);
                     listIt = orderList.erase(listIt);
-                } else {
                     ++listIt;
+                } else {
+                    return;
                 }
             }
         }
@@ -162,32 +162,35 @@ class OrderBook
         auto& matchingOrders = incomingOrder.isBuy ? sellOrders : buyOrders;
         auto& sameSideOrders = incomingOrder.isBuy ? buyOrders : sellOrders;
 
-        if (incomingOrder.isBuy) {
-            // Start from the lowest price for sell orders
-            matchOrdersHelper(
-                incomingOrder, matchingOrders.begin(), matchingOrders.end(), less_equal<double>());
-
-            // Delete empty levels starting from begin for sellOrders
-            for (auto it = matchingOrders.begin(); it != matchingOrders.end();) {
-                if (it->second.empty()) {
-                    it = matchingOrders.erase(it);
-                } else {
-                    ++it;
+        if (!matchingOrders.empty()) {
+            if (incomingOrder.isBuy) {
+                // Start from the lowest price for sell orders
+                matchOrdersHelper(incomingOrder,
+                                  matchingOrders.begin(),
+                                  matchingOrders.end(),
+                                  less<double>());
+                // Delete empty levels starting from begin for sellOrders
+                for (auto it = matchingOrders.begin(); it != matchingOrders.end();) {
+                    if (it->second.empty()) {
+                        it = matchingOrders.erase(it);
+                    } else {
+                        break;
+                    }
                 }
-            }
-        } else {
-            // Start from the highest price for buy orders
-            matchOrdersHelper(incomingOrder,
-                              matchingOrders.rbegin(),
-                              matchingOrders.rend(),
-                              greater_equal<double>());
+            } else {
+                // Start from the highest price for buy orders
+                matchOrdersHelper(incomingOrder,
+                                  matchingOrders.rbegin(),
+                                  matchingOrders.rend(),
+                                  greater<double>());
 
-            // Delete empty levels starting from rbegin for buyOrders
-            for (auto it = matchingOrders.rbegin(); it != matchingOrders.rend();) {
-                if (it->second.empty()) {
-                    it = decltype(it)(matchingOrders.erase(next(it).base()));
-                } else {
-                    ++it;
+                // Delete empty levels starting from rbegin for buyOrders (lowest)
+                for (auto it = matchingOrders.rbegin(); it != matchingOrders.rend();) {
+                    if (it->second.empty()) {
+                        it = decltype(it)(matchingOrders.erase(next(it).base()));
+                    } else {
+                        break;
+                    }
                 }
             }
         }
@@ -279,15 +282,20 @@ void testMatchOrders()
 {
     OrderBook orderBook;
     Order     buyOrder(1, true, 100.0, 10, false);
-    Order     sellOrder(2, false, 90.0, 5, false);
+    Order     buyOrder2(2, true, 200.0, 10, false);
+    Order     sellOrder(3, false, 90.0, 5, false);
 
     orderBook.processOrder(buyOrder);
+    orderBook.processOrder(buyOrder2);
+    customAssert(orderBook.buyOrders.size() == 2);
+    customAssert(orderBook.buyOrders.begin()->first == 100.0);
     orderBook.processOrder(sellOrder);
 
-    customAssert(orderBook.buyOrders.size() == 1);
-    customAssert(orderBook.buyOrders.begin()->second.begin()->order.quantity == 5);
+    customAssert(orderBook.buyOrders.size() == 2);
+    customAssert(orderBook.buyOrders.rbegin()->first == 200.0);
+    customAssert(orderBook.buyOrders.rbegin()->second.begin()->order.quantity == 5);
     customAssert(orderBook.sellOrders.size() == 0);
-    customAssert(orderBook.orderLookup.size() == 1);
+    customAssert(orderBook.orderLookup.size() == 2);
 }
 
 void testFillOrKillOrder()
@@ -318,6 +326,44 @@ void testCancelOrder()
     customAssert(orderBook.orderLookup.size() == 0);
 }
 
+void testMatchOrdersMultiplePriceLevels()
+{
+    OrderBook orderBook;
+    Order     buyOrder1(1, true, 100.0, 10, false);
+    Order     buyOrder2(2, true, 105.0, 15, false);
+    Order     buyOrder3(3, true, 110.0, 20, false);
+    Order     sellOrder(4, false, 100.0, 30, false);
+
+    orderBook.processOrder(buyOrder1);
+    orderBook.processOrder(buyOrder2);
+    orderBook.processOrder(buyOrder3);
+    orderBook.processOrder(sellOrder);
+
+    customAssert(orderBook.buyOrders.size() == 2);
+    customAssert(orderBook.buyOrders.rbegin()->second.begin()->order.quantity == 5);
+    customAssert(orderBook.buyOrders.rbegin()->first == 105.0);
+    customAssert(orderBook.sellOrders.size() == 0);
+    customAssert(orderBook.orderLookup.size() == 2);
+}
+
+void testMatchOrdersPartialFill()
+{
+    OrderBook orderBook;
+    Order     buyOrder1(1, true, 100.0, 10, false);
+    Order     buyOrder2(2, true, 105.0, 15, false);
+    Order     sellOrder(3, false, 100.0, 20, false);
+
+    orderBook.processOrder(buyOrder1);
+    orderBook.processOrder(buyOrder2);
+    orderBook.processOrder(sellOrder);
+
+    customAssert(orderBook.buyOrders.size() == 1);
+    customAssert(orderBook.buyOrders.begin()->second.begin()->order.quantity == 5);
+    customAssert(orderBook.buyOrders.begin()->first == 100.0);
+    customAssert(orderBook.sellOrders.size() == 0);
+    customAssert(orderBook.orderLookup.size() == 1);
+}
+
 void runTests()
 {
     vector<string> testResults;
@@ -327,6 +373,9 @@ void runTests()
     testResults.push_back(runTest("testMatchOrders", testMatchOrders));
     testResults.push_back(runTest("testFillOrKillOrder", testFillOrKillOrder));
     testResults.push_back(runTest("testCancelOrder", testCancelOrder));
+    testResults.push_back(
+        runTest("testMatchOrdersMultiplePriceLevels", testMatchOrdersMultiplePriceLevels));
+    testResults.push_back(runTest("testMatchOrdersPartialFill", testMatchOrdersPartialFill));
 
     // Print test results
     for (const auto& result : testResults) {
