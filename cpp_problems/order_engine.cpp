@@ -129,6 +129,30 @@ class OrderBook
    private:
     mutex bookMutex; // For thread safety (if required)
 
+    // Helper function to delete empty levels
+    void deleteEmptyLevels(bool isBuy, map<double, list<OrderNode>>& matchingOrders)
+    {
+        if (isBuy) {
+            // Delete empty levels starting from begin for sellOrders
+            for (auto it = matchingOrders.begin(); it != matchingOrders.end();) {
+                if (it->second.empty()) {
+                    it = matchingOrders.erase(it);
+                } else {
+                    break;
+                }
+            }
+        } else {
+            // Delete empty levels starting from rbegin for buyOrders (lowest)
+            for (auto it = matchingOrders.rbegin(); it != matchingOrders.rend();) {
+                if (it->second.empty()) {
+                    it = decltype(it)(matchingOrders.erase(next(it).base()));
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
     // Helper function to match orders
     template <typename Iterator, typename Comparator>
     void matchOrdersHelper(Order& incomingOrder, Iterator begin, Iterator end, Comparator comp)
@@ -169,30 +193,16 @@ class OrderBook
                                   matchingOrders.begin(),
                                   matchingOrders.end(),
                                   less<double>());
-                // Delete empty levels starting from begin for sellOrders
-                for (auto it = matchingOrders.begin(); it != matchingOrders.end();) {
-                    if (it->second.empty()) {
-                        it = matchingOrders.erase(it);
-                    } else {
-                        break;
-                    }
-                }
             } else {
                 // Start from the highest price for buy orders
                 matchOrdersHelper(incomingOrder,
                                   matchingOrders.rbegin(),
                                   matchingOrders.rend(),
                                   greater<double>());
-
-                // Delete empty levels starting from rbegin for buyOrders (lowest)
-                for (auto it = matchingOrders.rbegin(); it != matchingOrders.rend();) {
-                    if (it->second.empty()) {
-                        it = decltype(it)(matchingOrders.erase(next(it).base()));
-                    } else {
-                        break;
-                    }
-                }
             }
+
+            // Delete empty levels
+            deleteEmptyLevels(incomingOrder.isBuy, matchingOrders);
         }
 
         // Handle remaining quantities for fill-or-kill orders
