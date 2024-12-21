@@ -130,22 +130,22 @@ class OrderBook
     mutex bookMutex; // For thread safety (if required)
 
     // Helper function to delete empty levels
-    void deleteEmptyLevels(bool isBuy, map<double, list<OrderNode>>& matchingOrders)
+    void deleteEmptyLevels(bool isBuy, map<double, list<OrderNode>>& matchingSide)
     {
         if (isBuy) {
             // Delete empty levels starting from begin for sellOrders
-            for (auto it = matchingOrders.begin(); it != matchingOrders.end();) {
+            for (auto it = matchingSide.begin(); it != matchingSide.end();) {
                 if (it->second.empty()) {
-                    it = matchingOrders.erase(it);
+                    it = matchingSide.erase(it);
                 } else {
                     break;
                 }
             }
         } else {
             // Delete empty levels starting from rbegin for buyOrders (lowest)
-            for (auto it = matchingOrders.rbegin(); it != matchingOrders.rend();) {
+            for (auto it = matchingSide.rbegin(); it != matchingSide.rend();) {
                 if (it->second.empty()) {
-                    it = decltype(it)(matchingOrders.erase(next(it).base()));
+                    it = decltype(it)(matchingSide.erase(next(it).base()));
                 } else {
                     break;
                 }
@@ -183,24 +183,21 @@ class OrderBook
     // Match orders using price-time priority
     void matchOrder(Order& incomingOrder)
     {
-        auto& matchingOrders = incomingOrder.isBuy ? sellOrders : buyOrders;
-        auto& sameSideOrders = incomingOrder.isBuy ? buyOrders : sellOrders;
+        auto& matchingSide = incomingOrder.isBuy ? sellOrders : buyOrders;
+        auto& sameSide     = incomingOrder.isBuy ? buyOrders : sellOrders;
 
-        if (!matchingOrders.empty()) {
-            if (incomingOrder.isBuy) {
+        if (!matchingSide.empty()) {
+            if (incomingOrder.isBuy)
                 // Start from the lowest price for sell orders
                 matchOrdersHelper(
-                    incomingOrder, matchingOrders.begin(), matchingOrders.end(), less<double>());
-            } else {
+                    incomingOrder, matchingSide.begin(), matchingSide.end(), less<double>());
+            else
                 // Start from the highest price for buy orders
-                matchOrdersHelper(incomingOrder,
-                                  matchingOrders.rbegin(),
-                                  matchingOrders.rend(),
-                                  greater<double>());
-            }
+                matchOrdersHelper(
+                    incomingOrder, matchingSide.rbegin(), matchingSide.rend(), greater<double>());
 
             // Delete empty levels
-            deleteEmptyLevels(incomingOrder.isBuy, matchingOrders);
+            deleteEmptyLevels(incomingOrder.isBuy, matchingSide);
         }
 
         // Handle remaining quantities for fill-or-kill orders
@@ -212,10 +209,10 @@ class OrderBook
         // Add remaining quantities to the same side order book
         if (incomingOrder.quantity > 0) {
             OrderNode newNode(incomingOrder);
-            auto      it = sameSideOrders[incomingOrder.price].insert(
-                sameSideOrders[incomingOrder.price].end(), newNode);
+            auto      it =
+                sameSide[incomingOrder.price].insert(sameSide[incomingOrder.price].end(), newNode);
             newNode.it                         = it;
-            newNode.orderList                  = &sameSideOrders[incomingOrder.price];
+            newNode.orderList                  = &sameSide[incomingOrder.price];
             orderLookup[incomingOrder.orderId] = newNode;
         }
     }
