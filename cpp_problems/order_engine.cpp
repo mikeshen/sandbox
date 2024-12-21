@@ -189,10 +189,8 @@ class OrderBook
         if (!matchingOrders.empty()) {
             if (incomingOrder.isBuy) {
                 // Start from the lowest price for sell orders
-                matchOrdersHelper(incomingOrder,
-                                  matchingOrders.begin(),
-                                  matchingOrders.end(),
-                                  less<double>());
+                matchOrdersHelper(
+                    incomingOrder, matchingOrders.begin(), matchingOrders.end(), less<double>());
             } else {
                 // Start from the highest price for buy orders
                 matchOrdersHelper(incomingOrder,
