@@ -73,6 +73,42 @@
     </div>
   </div>
 
+  <!-- Comment Detail Modal -->
+  <div class="modal fade" id="commentDetailModal" tabindex="-1" aria-labelledby="commentDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="commentDetailModalLabel">Comment Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <h6>Subreddit</h6>
+            <p id="detail-subreddit" class="fw-bold"></p>
+          </div>
+          <div class="mb-3">
+            <h6>Parent Comment</h6>
+            <div id="detail-parent" class="border-start ps-3 mb-2 parent-comment"></div>
+          </div>
+          <div class="mb-3">
+            <h6>Comment Body</h6>
+            <div id="detail-body" class="border-start border-primary ps-3 comment-body"></div>
+          </div>
+          <div class="d-flex justify-content-between">
+            <div>
+              <span class="badge bg-secondary me-2">Score: <span id="detail-score"></span></span>
+              <span class="badge bg-info">Source: <span id="detail-source"></span></span>
+            </div>
+            <a id="detail-permalink" href="#" target="_blank" class="btn btn-sm btn-outline-primary">View on Reddit</a>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Custom JavaScript -->
   <script src="{{ url_for('static', filename='js/table.js') }}"></script>
   
