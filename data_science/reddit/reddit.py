@@ -99,6 +99,8 @@ Your analysis should move beyond a mere enumeration of mentioned topics. Instead
 
 Specifically, your overview should address the following:
 
+Start with a brief summary of the user's most prominent interests and perspectives, as inferred from their comments. This should be a high-level overview that encapsulates the essence of their engagement.
+
 Salient Topical Clusters: Identify and describe the most frequently recurring subjects or areas of discussion. Provide illustrative examples from the comments.
 Dominant Stances: For each identified topical cluster, articulate the user's typical viewpoint. Is their engagement characterised by critique, advocacy, curiosity, scepticism, or another discernible stance? Support your assessment with textual evidence.
 Linguistic Fingerprint: Analyse the user's tone and style of communication. Is their language predominantly technical, informal, confrontational, humorous, supportive, or cynical? What inferences can be drawn about their engagement style or potential online persona from this linguistic fingerprint?
