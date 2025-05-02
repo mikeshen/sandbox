@@ -1,0 +1,17 @@
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #f8f9fa;
+}
+
+header.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table-container {
+  margin: 2rem auto;
+  max-width: 1200px;
+}
+
+#table {
+  height: 70vh;
+}
