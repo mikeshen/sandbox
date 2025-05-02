@@ -45,3 +45,7 @@ header.navbar {
 .modal-dialog.modal-xl {
   max-width: 90%;
 }
+
+#analysisModal .modal-dialog {
+  max-width: 1000px; /* Fixed width in pixels */
+}
