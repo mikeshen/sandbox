@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
     paginationSize: 10,
     movableColumns: true,
     resizableRows: true,
-    initialSort: [{ column: "Score", dir: "desc" }],
     placeholder: "No comments to display",
   });
 });
