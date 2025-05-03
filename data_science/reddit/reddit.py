@@ -31,13 +31,27 @@ reddit = praw.Reddit(
     user_agent=reddit_user_agent
 )
 
-def fetch_posts(username, post_limit=10):
-    user = reddit.redditor(username)
-    return list(user.submissions.top(limit=post_limit, time_filter='all'))
+def batch_fetch_parent_info(comments):
+    """
+    Batch fetches parent information for a list of comments.
+    """
+    parent_ids = {comment.parent_id for comment in comments}  # Collect unique parent IDs
+    parent_objects = {parent.fullname: parent for parent in reddit.info(fullnames=parent_ids)}  # Fetch parent objects
 
-def fetch_comments(username, comment_limit=10):
-    user = reddit.redditor(username)
-    return list(user.comments.top(limit=comment_limit, time_filter='all'))
+    parent_info = {}
+    for comment in comments:
+        parent = parent_objects.get(comment.parent_id)
+        if isinstance(parent, praw.models.Comment):
+            parent_info[comment.id] = (False, parent.body)  # Not a root comment
+        elif isinstance(parent, praw.models.Submission):
+            post_content = f"Title: {parent.title}"
+            if parent.selftext:
+                post_content += f"\nText: {parent.selftext}"
+            parent_info[comment.id] = (True, post_content)  # Root comment
+        else:
+            parent_info[comment.id] = (True, None)  # Default to root comment with no parent info
+
+    return parent_info
 
 def get_user_comments(username, top_limit=250, new_limit=250):
     """
@@ -52,28 +66,27 @@ def get_user_comments(username, top_limit=250, new_limit=250):
     comments_top_ids = {comment.id for comment in comments_top}
     comments_new = [comment for comment in comments_new if comment.id not in comments_top_ids]
 
-    def get_parent_info(comment):
-        try:
-            parent = comment.parent()
-            if isinstance(parent, praw.models.Comment):
-                return True, parent.body
-        except Exception:
-            pass
-        return False, None
+    # Batch fetch parent info for all comments
+    all_comments = comments_top + comments_new
+    parent_info = batch_fetch_parent_info(all_comments)
 
-    comments = (
-        [{'Body': c.body, 'Score': c.score, 'Created': c.created_utc,
-          'Subreddit': str(c.subreddit), 'Permalink': c.permalink, 'Source': 'Top'}
-         for c in comments_top]
-        + [{'Body': c.body, 'Score': c.score, 'Created': c.created_utc,
-            'Subreddit': str(c.subreddit), 'Permalink': c.permalink, 'Source': 'New'}
-           for c in comments_new]
-    )
+    # Enrich comments with parent info
+    enriched_comments = [
+        {
+            'Body': c.body,
+            'Score': c.score,
+            'Created': c.created_utc,
+            'Subreddit': str(c.subreddit),
+            'Permalink': c.permalink,
+            'Source': 'Top' if c in comments_top else 'New',
+            'IsRoot': parent_info[c.id][0],
+            'ParentContent': parent_info[c.id][1],
+        }
+        for c in all_comments
+    ]
 
-
-
-    df = pd.DataFrame(comments)
-    df['HasParent'], df['ParentBody'] = zip(*(get_parent_info(c) for c in comments))
+    # Create a DataFrame
+    df = pd.DataFrame(enriched_comments)
     return df
 
 def generate_analysis_prompt(df):
@@ -112,7 +125,7 @@ Roast the User: If you were to provide a humorous or light-hearted critique of t
 Present your findings in a logically structured report, beginning with the most prominent observations and progressing to more nuanced interpretations. Maintain a critical and discerning approach, acknowledging the inherent limitations of inferring user characteristics from textual data alone. Avoid definitive pronouncements about the user's intrinsic personality; instead, focus rigorously on the observable patterns of interest and perspective within the provided comments."""
 
     formatted_comments = "\n\n".join(
-        (f"↳ Parent Comment:\nBody: {row['ParentBody']}\n" if row['HasParent'] else "")
+        (f"↳ Parent Content:\n{row['ParentContent']}\n" if not row['IsRoot'] else "")
         + f"OP Comment:\nBody: {row['Body']}\nScore: {row['Score']}\nCreated: {row['Created']}\nSubreddit: {row['Subreddit']}\nSource: {row['Source']}\nLink: https://www.reddit.com{row['Permalink']}\n"
         for _, row in df.iterrows()
     )

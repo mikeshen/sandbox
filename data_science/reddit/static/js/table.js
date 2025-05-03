@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     title: name,
     field: name,
     headerFilter: "input",
-    formatter: (name === "Body" || name === "ParentBody") 
+    formatter: (name === "Body" || name === "ParentContent") 
       ? "html"
       : undefined,
   }));
@@ -48,13 +48,13 @@ document.addEventListener('DOMContentLoaded', () => {
       permalinkElem.style.display = 'none';
     }
     
-    // Handle parent comment if exists
+    // Handle parent content if exists
     const parentElem = document.getElementById('detail-parent');
-    if (rowData.HasParent && rowData.ParentBody) {
-      parentElem.innerHTML = marked.parse(rowData.ParentBody);
+    if (rowData.ParentContent) {
+      parentElem.innerHTML = marked.parse(rowData.ParentContent);
       parentElem.parentElement.style.display = 'block';
     } else {
-      parentElem.innerHTML = '<em>No parent comment</em>';
+      parentElem.innerHTML = '<em>No parent content</em>';
       parentElem.parentElement.style.display = 'block';
     }
     
