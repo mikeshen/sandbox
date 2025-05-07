@@ -15,7 +15,7 @@ The project is organized into the following subfolders:
 
 ### data_science
 - **Description**: Contains data science projects and notebooks.
-- ** Also currently contains reddit profile analyzer project.
+- Also currently contains reddit profile analyzer project.
 
 ### python_problems
 - **Description**: Contains Python programming problems and solutions.
