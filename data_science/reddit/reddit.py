@@ -60,7 +60,7 @@ def batch_fetch_parent_info(comments):
     return parent_info
 
 
-def get_user_comments(username, top_limit=250, new_limit=250):
+def get_user_comments(username, top_limit=450, new_limit=50):
     """
     Fetches a user's top and new comments, enriches with parent info,
     and returns a pandas DataFrame.
