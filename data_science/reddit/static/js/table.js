@@ -63,6 +63,23 @@ document.addEventListener("DOMContentLoaded", () => {
       parentElem.parentElement.style.display = "block";
     }
 
+    // Display timestamp into human readable format for "Created"
+    // const createdElem = document.getElementById("detail-created");
+    // if (rowData.Created) {
+    //   const createdDate = new Date(rowData.Created * 1000); // Assuming timestamp is in seconds
+    //   const formattedDate = new Intl.DateTimeFormat("en-US", {
+    //     year: "numeric",
+    //     month: "long",
+    //     day: "numeric",
+    //     hour: "2-digit",
+    //     minute: "2-digit",
+    //     second: "2-digit",
+    //   }).format(createdDate);
+    //   createdElem.textContent = formattedDate;
+    // } else {
+    //   createdElem.textContent = "Unknown";
+    // }
+
     // Show modal
     modal.show();
   });
