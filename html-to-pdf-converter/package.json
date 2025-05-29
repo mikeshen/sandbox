@@ -1,0 +1,21 @@
+{
+  "name": "html-to-pdf-converter",
+  "version": "1.0.0",
+  "description": "A project to convert HTML files to PDF using Puppeteer.",
+  "main": "src/convert.js",
+  "scripts": {
+    "convert": "node src/convert.js"
+  },
+  "dependencies": {
+    "puppeteer": "^24.9.0"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "html",
+    "pdf",
+    "converter",
+    "puppeteer"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
